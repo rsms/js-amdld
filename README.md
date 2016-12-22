@@ -7,7 +7,7 @@ Simple JavaScript AMD module loader.
 - Has no dependencies and is small in size.
 - Modules can be loaded gradually and randomly over time with just-in-time initialization as dependencies are resolved.
 
-If you're serving content over HTTP/2, simply `<script src="amdls.js"></script>`,
+If you're serving content over HTTP/2, simply `<script src="amdld.min.js"></script>`,
 otherwise you'll probably just want to copy-paste the code into your HTML.
 
 The API is very simple:
