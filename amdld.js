@@ -5,10 +5,42 @@
   let modules = new Map; // Map<string,ModuleDefinition>
   let waiting = new Map; // Map<string,Set<string>>
 
+  function _require(id) {
+    let m = modules.get(id);
+    if (!m) {
+      if (require) {
+        return require(id);
+      }
+      throw new Error(`unknown module "${id}"`);
+    }
+    return m.init ? undefined : m['exports'];
+  }
+
+  /**
+   * @final
+   * @constructor
+   * @param {string|null}        id
+   * @param {object|null}        exports
+   * @param {Array<string>|null} deps
+   * @param {Function|object}    fn
+   */
+  function Module(id, exports, deps, fn) {
+    this['id']      = id;
+    this['exports'] = exports;
+    this.deps       = deps;
+    this.fn         = fn;
+    this.init       = null;
+    this.waitdeps   = null;
+  }
+
   // Return the path to dependency 'id' starting at m.
   // Returns null if m does not depend on id.
   // Note: This is not a generic function but only works during initialization
   // and is currently only used for cyclic-dependency check.
+  /**
+   * @param {Module} m
+   * @param {string} id
+   */
   function deppath(m, id) { // : Array<string> | null
     if (m.waitdeps) {
       for (let wdepid of m.waitdeps) {
@@ -27,6 +59,61 @@
     return null;
   }
 
+  /**
+   * @param {Module} m
+   */
+  function mfinalize(m) {
+    // clear init to signal that the module has been initialized
+    m.init = null;
+    
+    // get dependants that are waiting
+    let waitingDependants = waiting.get(m.id);
+    waiting.delete(m.id); // clear this module from `waiting`
+
+    if (m.fn) {
+      // execute module function
+      let res = m.fn.apply(m['exports'], m.deps);
+      if (res) {
+        m['exports'] = res;
+      }
+      m.fn = null;
+    }
+
+    // clear module properties to free up memory since m will live forever because
+    // it's owned by modules which is bound to the define's closure.
+    m.deps = null;
+    m.waitdeps = null;
+
+    if (waitingDependants) {
+      // check in on dependants
+      for (let depid of waitingDependants) {
+        let depm = modules.get(depid);
+        if (depm.init) {
+          if (depm.waitdeps.size == 1) {
+            // The just-initialized module is the last dependency.
+            // Resume initialization of depm.
+            depm.init();
+          } else {
+            // The just-initialized module is one of many dependencies.
+            // Simply clear this module from depm's waitdeps
+            depm.waitdeps.delete(m.id);
+          }
+        }
+      }
+      // assert(typeof m.id != 'symbol');
+    } else if (typeof m.id == 'symbol') {
+      // remove anonymous module reference as it was only needed while
+      // resoling its dependencies. Note that typeof=='symbol' is only available in
+      // environments with native Symbols, so we will not be able to clean up
+      // anon modules when running in older JS environments. It's an okay trade-off
+      // as checking for "shimmed" symbol type is quite complicated.
+      modules.delete(m.id);
+    }
+  }
+
+  /**
+   * @param {Module} m
+   */
   function* minitg(m, deps) {
     while (true) {
 
@@ -36,14 +123,16 @@
           continue;
         }
         if (depid == 'require') {
-          m.deps[i] = require;
+          m.deps[i] = _require;
         } else if (depid == 'exports') {
-          m.deps[i] = m.exports;
+          m.deps[i] = m['exports'];
+        } else if (depid == 'module') {
+          m.deps[i] = m;
         } else {
           let depm = modules.get(depid);
           if (depm && !depm.init) {
             // dependency is initialized
-            m.deps[i] = depm.exports;
+            m.deps[i] = depm['exports'];
             if (m.waitdeps) {
               m.waitdeps.delete(depid);
             }
@@ -79,42 +168,14 @@
       yield m.waitdeps;
     }
 
-    // clear init to signal that the module has been initialized
-    m.init = null;
-    
-    // get dependants that are waiting
-    let waitingDependants = waiting.get(m.id);
-    waiting.delete(m.id); // clear this module from `waiting`
-
-    // execute module function
-    m.fn.apply(m.exports, m.deps);
-
-    // clear module properties to free up memory since m will live forever because
-    // it's owned by modules which is bound to the define's closure.
-    m.deps = null;
-    m.fn = null;
-    m.waitdeps = null;
-
-    if (waitingDependants) {
-      // check in on dependants
-      for (let depid of waitingDependants) {
-        let depm = modules.get(depid);
-        if (depm.init) {
-          if (depm.waitdeps.size == 1) {
-            // The just-initialized module is the last dependency.
-            // Resume initialization of depm.
-            depm.init();
-          } else {
-            // The just-initialized module is one of many dependencies.
-            // Simply clear this module from depm's waitdeps
-            depm.waitdeps.delete(m.id);
-          }
-        }
-      }
-    }
+    mfinalize(m);
   }
 
   // Creates a resumable init function for module m with dependencies deps
+  /**
+   * @param {Module} m
+   * @param {Array<string>|null} deps
+   */
   function minit(m, deps) {
     let initg = minitg(m, deps);
 
@@ -160,6 +221,7 @@
     }
   }
 
+  // define(id?, deps?, fn)
   function define(id, deps, fn) {
     if (define.timeout && define.timeout > 0) {
       if (timeoutReached) {
@@ -168,17 +230,77 @@
       clearTimeout(timeoutTimer);
       timeoutTimer = setTimeout(timeout, define.timeout);
     }
-    let m = {
-      id,
-      deps: new Array(deps.length),
-      fn,
-      exports: {},
-      init: null,
-      waitdeps: null,
-    };
-    modules.set(id, m);
+
+    let objfact = 1; // 0=no, 1=?, 2=yes
+
+    switch (typeof id) {
+      case 'function': {
+        // define(factory)
+        fn = id;
+        id = null;
+        deps = [];
+        objfact = 0;
+        break;
+      }
+      case 'object': {
+        // define([...], factory)
+        fn = deps;
+        deps = id;
+        id = null;
+        if (typeof fn != 'function') {
+          // define([...], {...})
+          throw new Error('object module without id');
+        }
+        break;
+      }
+      default: {
+        objfact = 0;
+        if (typeof deps == 'function') {
+          // define(id, factory)
+          fn = deps;
+          deps = [];
+        } else if (!fn) {
+          // define(id, obj)
+          fn = deps;
+          deps = [];
+          objfact = 2;
+        }
+        // else: define(id, [...], factory)
+        break;
+      }
+    }
+
+    if (!deps || deps.length == 0) {
+      // no dependencies
+      objfact = (objfact == 1 && typeof fn != 'function') ? 2 : objfact;
+      let m = new Module(id, objfact ? fn : {}, null, objfact ? null : fn);
+      if (id) {
+        modules.set(id, m);
+        mfinalize(m);
+      } else {
+        // Note: intentionally ignoring return value as a module w/o an id
+        // is never imported by anything.
+        fn.apply(m['exports']);
+        m.fn = null;
+      }
+      return true;
+    }
+
+    if (typeof fn != 'function') {
+      // define('id', [...], {...})
+      throw new Error('object module with dependencies');
+    }
+
+    // resolve dependencies
+    let m = new Module(
+      id || Symbol(),
+      {},
+      new Array(deps.length),
+      fn
+    );
+    modules.set(m.id, m);
     m.init = minit(m, deps);
-    m.init();
+    return m.init();
   }
 
   // Set to a number larger than zero to enable timeout.
@@ -186,13 +308,8 @@
   // an error is thrown if there are still undefined modules.
   define['timeout'] = 0;
 
-  define['require'] = function(id) {
-    let m = modules.get(id);
-    if (!m) {
-      throw new Error(`unknown module "${id}"`);
-    }
-    return m.init ? undefined : m.exports;
-  };
+  define['require'] = _require;
+  define['amd'] = {};
 
   exports['define'] = define;
-})(this, typeof require == 'undefined' ? undefined : require);
+})(this, typeof require == 'function' ? require : null);

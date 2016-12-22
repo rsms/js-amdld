@@ -1,6 +1,6 @@
 # AMD loader
 
-Simple JavaScript AMD module loader.
+Simple JavaScript [AMD module](https://github.com/amdjs/amdjs-api/blob/master/AMD.md) loader.
 
 - Uses generators to resolve dependencies quickly and efficiently.
 - Provides deterministic module initialization by verifying there are no cyclic dependencies.
@@ -13,7 +13,24 @@ otherwise you'll probably just want to copy-paste the code into your HTML.
 The API is very simple:
 
 ```ts
-define(id :string, deps :string[], body :(deps :any[])=>) : boolean
+define(
+  id?           : string,
+  dependencies? : string[],
+  factory       : (...dependencies :any[])=>void
+                | {[key :string] :any}
+) : boolean
+```
+
+E.g.
+
+```js
+define("A", ["B", "C"], function(B, C) {
+  console.log(C.hello, B.world);
+});
+define("B", ["exports"], function(exports) {
+  exports.world = 'world';
+});
+define("C", { hello: 'Hello' });
 ```
 
 Get a tested optimized ES5-compatible build from [releases](https://github.com/rsms/js-amdld/releases) or [NPM](https://www.npmjs.com/package/amdld).
@@ -113,8 +130,15 @@ The ["cyclic3" test](test/cyclic3_test.js) verifies this behavior.
 ## API
 
 ```ts
-define(id :string, deps :string[], body :(deps :any[])=>) : boolean
-  // Define a module
+define(
+  id? :string,
+  dependencies? :string[],
+  factory :(...dependencies :any[])=>void | {[key :string] :any}
+) : boolean
+  // Define a module. Returns true if the module was initialized immediately,
+  // otherwise false is returned to indicate that initialization is suspended
+  // waiting for a dependency.
+  // See https://github.com/amdjs/amdjs-api/blob/master/AMD.md for details.
 
 define.timeout : number
   // Set to a number larger than zero to enable timeout.

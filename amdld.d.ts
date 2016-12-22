@@ -1,4 +1,10 @@
-export function define(id :string, deps :string[], body :(deps :any)=>void) :boolean;
+type Factory = (...dependencies :any[])=>void | {[key :string] :any};
+
+export function define(id :string, dependencies :string[], factory :Factory) :boolean;
+export function define(id :string, factory :Factory) :boolean;
+export function define(dependencies :string[], factory :Factory) :boolean;
+export function define(factory :Factory) :boolean;
+
 export namespace define {
   export var timeout :number;
   export function require(id :string): any;
