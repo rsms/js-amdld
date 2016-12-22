@@ -1,10 +1,13 @@
 language: node_js
+
 node_js:
   - node  # latest stable
   - 6
+
 before_script:
   - sudo apt-get -qq update
   - sudo apt-get install -y closure-compiler
+
 script:
   - npm build
   - npm test
