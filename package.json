@@ -1,12 +1,18 @@
 {
   "name": "amdld",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AMD module loader with deterministic and just-in time module initialization",
   "main": "amdld.js",
   "typings": "lru.d.ts",
   "directories": {
     "test": "test"
   },
+  "files": [
+    "amdld.js",
+    "amdld.d.ts",
+    "amdld.min.js",
+    "amdld.min.js.map"
+  ],
   "keywords": [
     "amd",
     "module",
