@@ -158,13 +158,11 @@ define.require(id :string) : any
 
 ## Building and testing
 
-To build the minified version, make sure you have [`closure-compiler`](https://developers.google.com/closure/compiler/) in your `$PATH` and:
+To build the minified version
 
-```
-$ npm run build
-```
-
-This will take `amdld.js` as input and write an optimized and ES5-compatible version to `amdld.min.js` and `amdld.min.js.map`.
+1. Make sure you have `java` in your `$PATH` (required for closure-compiler)
+2. `npm install` to install typescript and closure-compiler
+3. `npm run build` to build `amdld.min.js` and `amdld.min.js.map`
 
 To run unit tests, simply:
 

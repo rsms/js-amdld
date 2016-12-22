@@ -20,9 +20,9 @@
    * @final
    * @constructor
    * @param {string|null}        id
-   * @param {object|null}        exports
-   * @param {Array<string>|null} deps
-   * @param {Function|object}    fn
+   * @param {Object|null}        exports
+   * @param {Array<Object>|null} deps
+   * @param {Function|Object}    fn
    */
   function Module(id, exports, deps, fn) {
     this['id']      = id;
@@ -45,13 +45,13 @@
     if (m.waitdeps) {
       for (let wdepid of m.waitdeps) {
         if (wdepid == id) {
-          return [m.id];
+          return [m['id']];
         }
         let wdepm = modules.get(wdepid);
         if (wdepm) {
           let path = deppath(wdepm, id);
           if (path) {
-            return [m.id].concat(path);
+            return [m['id']].concat(path);
           }
         }
       }
@@ -67,8 +67,8 @@
     m.init = null;
     
     // get dependants that are waiting
-    let waitingDependants = waiting.get(m.id);
-    waiting.delete(m.id); // clear this module from `waiting`
+    let waitingDependants = waiting.get(m['id']);
+    waiting.delete(m['id']); // clear this module from `waiting`
 
     if (m.fn) {
       // execute module function
@@ -96,18 +96,18 @@
           } else {
             // The just-initialized module is one of many dependencies.
             // Simply clear this module from depm's waitdeps
-            depm.waitdeps.delete(m.id);
+            depm.waitdeps.delete(m['id']);
           }
         }
       }
-      // assert(typeof m.id != 'symbol');
-    } else if (typeof m.id == 'symbol') {
+      // assert(typeof m['id'] != 'symbol');
+    } else if (typeof m['id'] == 'symbol') {
       // remove anonymous module reference as it was only needed while
       // resoling its dependencies. Note that typeof=='symbol' is only available in
       // environments with native Symbols, so we will not be able to clean up
       // anon modules when running in older JS environments. It's an okay trade-off
       // as checking for "shimmed" symbol type is quite complicated.
-      modules.delete(m.id);
+      modules.delete(m['id']);
     }
   }
 
@@ -148,12 +148,14 @@
 
             // check for cyclic dependencies when depm.init is still pending
             if (DEBUG && depm) {
-              let cycle = deppath(depm, m.id);
+              let cycle = deppath(depm, m['id']);
               if (cycle) {
-                if (cycle[cycle.length-1] != m.id) {
-                  cycle.push(m.id);
+                if (cycle[cycle.length-1] != m['id']) {
+                  cycle.push(m['id']);
                 }
-                throw new Error(`Cyclic module dependency: ${m.id} -> ${cycle.join(' -> ')}`);
+                throw new Error(
+                  `Cyclic module dependency: ${m['id']} -> ${cycle.join(' -> ')}`
+                );
               }
             }
           }
@@ -190,9 +192,9 @@
       for (let depid of v.value) {
         let waitset = waiting.get(depid);
         if (waitset) {
-          waitset.add(m.id);
+          waitset.add(m['id']);
         } else {
-          waiting.set(depid, new Set([m.id]));
+          waiting.set(depid, new Set([m['id']]));
         }
       }
 
@@ -298,7 +300,7 @@
       new Array(deps.length),
       fn
     );
-    modules.set(m.id, m);
+    modules.set(m['id'], m);
     m.init = minit(m, deps);
     return m.init();
   }
