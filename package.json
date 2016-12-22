@@ -1,0 +1,33 @@
+{
+  "name": "amdld",
+  "version": "0.1.0",
+  "description": "AMD module loader with deterministic and just-in time module initialization",
+  "main": "amdld.js",
+  "typings": "lru.d.ts",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "amd",
+    "module",
+    "web"
+  ],
+  "author": "Rasmus Andersson <me@rsms.me>",
+  "license": "MIT",
+  "scripts": {
+    "test": "node test/test.js && echo 'testing TypeScript...' && tsc test/tstest.ts && node test/tstest.js",
+    "build": "closure-compiler --compilation_level ADVANCED --env BROWSER --js_output_file amdld.min.js --output_wrapper '(function(){%output%}).call(this);' --language_out ECMASCRIPT5_STRICT --create_source_map amdld.min.js.map amdld.js",
+    "prepublish": "npm run build && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rsms/js-amdld.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rsms/js-amdld/issues"
+  },
+  "homepage": "https://github.com/rsms/js-amdld#readme",
+  "devDependencies": {
+    "typescript": "^2.1.4"
+  }
+}
