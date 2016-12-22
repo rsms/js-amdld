@@ -16,6 +16,8 @@ The API is very simple:
 define(id :string, deps :string[], body :(deps :any[])=>) -> bool
 ```
 
+Get a tested optimized ES5-compatible build from [releases](releases) or [NPM](https://www.npmjs.com/package/amdld).
+
 
 ## Random loading
 
@@ -127,7 +129,13 @@ define.require(id :string) :any
 
 ## Building and testing
 
-To build the minified version, make sure you have [`closure-compiler`](https://developers.google.com/closure/compiler/) in your `$PATH` and run `npm run build`, which will take `amdld.js` as input and write an ES5-compatible "minified" version to `amdld.min.js` and `amdld.min.js.map`.
+To build the minified version, make sure you have [`closure-compiler`](https://developers.google.com/closure/compiler/) in your `$PATH` and:
+
+```
+$ npm run build
+```
+
+This will take `amdld.js` as input and write an optimized and ES5-compatible version to `amdld.min.js` and `amdld.min.js.map`.
 
 To run unit tests, simply:
 
