@@ -158,20 +158,21 @@ define.require(id :string) : any
 
 ## Building and testing
 
-To build the minified version
+To build the minified version:
 
 1. Make sure you have `java` in your `$PATH` (required for closure-compiler)
 2. `npm install` to install typescript and closure-compiler
 3. `npm run build` to build `amdld.min.js` and `amdld.min.js.map`
 
-To run unit tests, simply:
+To run unit tests, simply run `npm test` or the much faster `test/test.js`:
 
 ```
-$ npm test
-[basic @amdld.js] ... OK
-[basic @amdld.min.js] ... OK
-[cyclic1 @amdld.js] ... OK
+$ test/test.js
+pass basic @amdld.js
+pass basic @amdld.min.js
+pass cyclic1 @amdld.js
 ...
+all pass
 ```
 
 Note: Building and testing requires [Nodejs](https://nodejs.org/) to be installed, but is not required for using AMDLD in a web browser.
