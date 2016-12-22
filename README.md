@@ -13,7 +13,7 @@ otherwise you'll probably just want to copy-paste the code into your HTML.
 The API is very simple:
 
 ```ts
-define(id :string, deps :string[], body :(deps :any[])=>) -> bool
+define(id :string, deps :string[], body :(deps :any[])=>) : boolean
 ```
 
 Get a tested optimized ES5-compatible build from [releases](https://github.com/rsms/js-amdld/releases) or [NPM](https://www.npmjs.com/package/amdld).
@@ -113,15 +113,15 @@ The ["cyclic3" test](test/cyclic3_test.js) verifies this behavior.
 ## API
 
 ```ts
-define(id :string, deps :string[], body :(deps :any[])=>) -> bool
+define(id :string, deps :string[], body :(deps :any[])=>) : boolean
   // Define a module
 
-define.timeout :number
+define.timeout : number
   // Set to a number larger than zero to enable timeout.
   // Whenever define() is called, the timeout is reset.
   // When the timer expires an error is thrown if there are still undefined modules.
 
-define.require(id :string) :any
+define.require(id :string) : any
   // Acquire a module's exported API. Throws an error if the module is not defined.
   // Might return undefined if the module has not yet been initialized.
 ```
