@@ -7,6 +7,8 @@ Simple JavaScript [AMD module](https://github.com/amdjs/amdjs-api/blob/master/AM
 - Has no dependencies and is small in size.
 - Modules can be loaded gradually and randomly over time with just-in-time initialization as dependencies are resolved.
 
+[![Build status](https://travis-ci.org/rsms/js-amdld.svg?branch=master)](https://travis-ci.org/rsms/js-amdld)
+
 Simply include the script:
 
 ```html
