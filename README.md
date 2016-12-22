@@ -16,7 +16,7 @@ The API is very simple:
 define(id :string, deps :string[], body :(deps :any[])=>) -> bool
 ```
 
-Get a tested optimized ES5-compatible build from [releases](releases) or [NPM](https://www.npmjs.com/package/amdld).
+Get a tested optimized ES5-compatible build from [releases](https://github.com/rsms/js-amdld/releases) or [NPM](https://www.npmjs.com/package/amdld).
 
 
 ## Random loading
