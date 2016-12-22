@@ -7,8 +7,11 @@ Simple JavaScript [AMD module](https://github.com/amdjs/amdjs-api/blob/master/AM
 - Has no dependencies and is small in size.
 - Modules can be loaded gradually and randomly over time with just-in-time initialization as dependencies are resolved.
 
-If you're serving content over HTTP/2, simply `<script src="amdld.min.js"></script>`,
-otherwise you'll probably just want to copy-paste the code into your HTML.
+Simply include the script:
+
+```html
+<script src="https://unpkg.com/amdld/amdld.min.js"></script>
+```
 
 The API is very simple:
 
@@ -33,7 +36,7 @@ define("B", ["exports"], function(exports) {
 define("C", { hello: 'Hello' });
 ```
 
-Get a tested optimized ES5-compatible build from [releases](https://github.com/rsms/js-amdld/releases) or [NPM](https://www.npmjs.com/package/amdld).
+Get a tested optimized ES5-compatible build from [unpkg](https://unpkg.com/amdld/) or [NPM](https://www.npmjs.com/package/amdld).
 
 
 ## Random loading
