@@ -4,7 +4,7 @@ Simple JavaScript [AMD module](https://github.com/amdjs/amdjs-api/blob/master/AM
 
 - Uses generators to resolve dependencies quickly and efficiently.
 - Provides deterministic module initialization by verifying there are no cyclic dependencies.
-- Has no dependencies and is small in size.
+- Has no dependencies and is small in size ([ES6 version](https://unpkg.com/amdld/amdld.es6.min.js) is only 2500 bytes.)
 - Modules can be loaded gradually and randomly over time with just-in-time initialization as dependencies are resolved.
 
 [![Build status](https://travis-ci.org/rsms/js-amdld.svg?branch=master)](https://travis-ci.org/rsms/js-amdld)
@@ -46,6 +46,10 @@ If you're only targeting ES6 hosts—for instance in an Electron app—use `amdl
 <script src="https://unpkg.com/amdld/amdld.es6.min.js"></script>
 ```
 
+
+## Just-in time initialization
+
+![Illustration](misc/timeline.png)
 
 ## Random loading
 
