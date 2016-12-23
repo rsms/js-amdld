@@ -51,6 +51,7 @@ If you're only targeting ES6 hosts—for instance in an Electron app—use `amdl
 
 [![Illustration](misc/timeline.png)](https://www.figma.com/file/HdeD6xoSRs1LeLl1yDeGgHf3/AMDLD)
 
+
 ## Random loading
 
 Since AMDLD uses initializeras with pause-and-resumable state, dependencies and modules can be loaded in random order, in synchronous or asynchronous fashion.
@@ -168,13 +169,25 @@ define.require(id :string) : any
 
 ## Building and testing
 
-To build the minified version:
+Although you can use `amdld.js` as-is in an ES6 environment (like latest Chrome or Firefox), there are three products that are generated from the source:
 
-1. Make sure you have `java` in your `$PATH` (required for closure-compiler)
-2. `npm install` to install typescript and closure-compiler
-3. `npm run build` to build `amdld.min.js` and `amdld.min.js.map`
+- `amdld.g.js` — assertions enabled
+- `amdld.min.js` — optimized code for ES5 targets (~4 kB)
+  - `amdld.min.js.map` — source mappings to `amdld.js`
+- `amdld.es6.min.js` — optimized code for ES6 targets (~2.5 kB)
+  - `amdld.es6.min.js.map` — source mappings to `amdld.js`
 
-To run unit tests, simply run `npm test` or the much faster `test/test.js`:
+To build all of these, first make sure you have `java` in your `$PATH` as it's required for closure-compiler. Then:
+
+```
+$ npm install # install typescript and closure-compiler
+$ npm run build
+...
+$ npm run build
+...
+```
+
+To run all unit tests, use `npm test` or the much faster `test/test.js`:
 
 ```
 $ test/test.js
