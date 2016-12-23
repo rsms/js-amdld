@@ -1,23 +1,12 @@
-/**
- * Include cyclic dependency checks.
- * When compiling, pass -D 'CHECK_CYCLES=false' to disable.
- * @define {boolean}
- */
-const CHECK_CYCLES = true;
-
-/**
- * Include runtime debug code like assertion checks.
- * When compiling, pass -D 'DEBUG=false' to disable.
- * @define {boolean}
- */
-const DEBUG = true;
-
 (function(exports, require){
   "use strict";
 
-  let assert = !DEBUG ? function(){} : function(cond) {
+  const CHECK_CYCLES = 1;
+  const DEBUG = 0; // = 1 in .g.js builds
+
+  let assert = DEBUG ? function(cond) {
     if (!cond) { throw new Error('assertion failure'); }
-  };
+  } : function(){};
 
   /** @private {Map<string|symbol,Module>} */
   let modules = new Map;

@@ -27,7 +27,8 @@
     "build-es5": "java -jar node_modules/google-closure-compiler/compiler.jar $CLOSUREC_ARGS -D 'DEBUG=false' -O ADVANCED --env BROWSER --new_type_inf --rewrite_polyfills=false --process_closure_primitives=false --language_in ECMASCRIPT6_STRICT --language_out ECMASCRIPT5_STRICT --js_output_file amdld.min.js --output_wrapper '(function(){%output%}).call(this);' --create_source_map amdld.min.js.map amdld.js",
     "build-es5-pretty": "CLOSUREC_ARGS=\"--formatting PRETTY_PRINT\" npm run build",
     "build-es6": "node_modules/.bin/babili --compact=true --minified --source-maps --no-comments --out-file amdld.es6.min.js amdld.js",
-    "build": "npm run build-es5 && npm run build-es6",
+    "build-debug": "sed 's/const DEBUG = 0/const DEBUG = 1/' amdld.js > amdld.g.js",
+    "build": "npm run build-es5 && npm run build-es6 && npm run build-debug",
     "prepublish": "npm run build && npm test",
     "postinstall": "if (which java >/dev/null) && [ -f node_modules/google-closure-compiler/compiler.jar ]; then npm run build; fi"
   },

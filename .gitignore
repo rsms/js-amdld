@@ -1,5 +1,6 @@
 .DS_Store
 *.min.js
-*.min.js.map
+*.g.js
+*.map
 test/tstest.js
 node_modules

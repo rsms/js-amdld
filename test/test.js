@@ -4,7 +4,7 @@ const assert = require('assert')
 const vm = require('vm')
 const fs = require('fs')
 
-let amdldVariants = ['amdld.js', 'amdld.min.js', 'amdld.es6.min.js'];
+let amdldVariants = ['amdld.g.js', 'amdld.min.js', 'amdld.es6.min.js'];
 let logDebug = function(){};
 let isInteractive = null; // [stdoutistty:bool, stderristty:bool]
 
@@ -196,7 +196,7 @@ if (args.indexOf('-h') != -1 || args.indexOf('--help') != -1) {
   console.error([
     'Usage: test [options] [<test> ...]',
     'options:',
-    '  --skip-min-lib       Only test against the development library (amdld.js).',
+    '  --only-debug-lib     Only test against the development library (amdld.g.js or amdld.js).',
     '  --debug              Enable debug mode; prints detailed information.',
     '  --[non-]interactive  Instead of checking if stdout is interactive, be explicit',
     '                       about whether colors and other TTY-related things are output.',
@@ -204,7 +204,7 @@ if (args.indexOf('-h') != -1 || args.indexOf('--help') != -1) {
   process.exit(1);
 }
 
-if (checkflag('--skip-min-lib')) {
+if (checkflag('--only-debug-lib')) {
   amdldVariants = amdldVariants.slice(0,1);
 }
 
@@ -228,12 +228,18 @@ if (checkflag('--debug')) {
 }
 
 let amdldSrc = {};
+let loadedCount = 0;
 for (let fn of amdldVariants) {
   try {
     amdldSrc[fn] = fs.readFileSync(__dirname + '/../' + fn);
+    ++loadedCount;
   } catch (err) {
     console.error(style(1,'yellow', fn+' not found -- skipping tests for this variant'));
   }
+}
+if (loadedCount == 0) {
+  // fallback to testing source vanilla
+  amdldSrc[amdldVariants[0]] = fs.readFileSync(__dirname + '/../amdld.js');
 }
 
 
