@@ -1,4 +1,4 @@
-type Factory = (...dependencies :any[])=>void | {[key :string] :any};
+type Factory = (...dependencies :any[])=>any | {[key :string] :any};
 
 export function define(id :string, dependencies :string[], factory :Factory) :boolean;
 export function define(id :string, factory :Factory) :boolean;

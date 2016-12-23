@@ -21,7 +21,7 @@ The API is very simple:
 define(
   id?           : string,
   dependencies? : string[],
-  factory       : (...dependencies :any[])=>void
+  factory       : (...dependencies :any[])=>any
                 | {[key :string] :any}
 ) : boolean
 ```
@@ -147,9 +147,10 @@ The ["cyclic3" test](test/cyclic3_test.js) verifies this behavior.
 
 ```ts
 define(
-  id? :string,
-  dependencies? :string[],
-  factory :(...dependencies :any[])=>void | {[key :string] :any}
+  id?           : string,
+  dependencies? : string[],
+  factory       : (...dependencies :any[])=>any
+                | {[key :string] :any}
 ) : boolean
   // Define a module. Returns true if the module was initialized immediately,
   // otherwise false is returned to indicate that initialization is suspended
