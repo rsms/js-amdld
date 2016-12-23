@@ -1,9 +1,29 @@
+/**
+ * Include cyclic dependency checks.
+ * When compiling, pass -D 'CHECK_CYCLES=false' to disable.
+ * @define {boolean}
+ */
+const CHECK_CYCLES = true;
+
+/**
+ * Include runtime debug code like assertion checks.
+ * When compiling, pass -D 'DEBUG=false' to disable.
+ * @define {boolean}
+ */
+const DEBUG = true;
+
 (function(exports, require){
+  "use strict";
 
-  const DEBUG = true;
+  let assert = !DEBUG ? function(){} : function(cond) {
+    if (!cond) { throw new Error('assertion failure'); }
+  };
 
-  let modules = new Map; // Map<string,ModuleDefinition>
-  let waiting = new Map; // Map<string,Set<string>>
+  /** @private {Map<string|symbol,Module>} */
+  let modules = new Map;
+
+  /** @private {Map<string|symbol,Set<string|symbol>>} */
+  let waiting = new Map;
 
   function _require(id) {
     let m = modules.get(id);
@@ -19,7 +39,7 @@
   /**
    * @final
    * @constructor
-   * @param {string|null}        id
+   * @param {string|symbol|null} id
    * @param {Object|null}        exports
    * @param {Array<Object>|null} deps
    * @param {Function|Object}    fn
@@ -67,7 +87,7 @@
     m.init = null;
     
     // get dependants that are waiting
-    let waitingDependants = waiting.get(m['id']);
+    let /** Set<symbol|string> */ waitingDependants = waiting.get(m['id']);
     waiting.delete(m['id']); // clear this module from `waiting`
 
     if (m.fn) {
@@ -100,7 +120,7 @@
           }
         }
       }
-      // assert(typeof m['id'] != 'symbol');
+      assert(typeof m['id'] != 'symbol');
     } else if (typeof m['id'] == 'symbol') {
       // remove anonymous module reference as it was only needed while
       // resoling its dependencies. Note that typeof=='symbol' is only available in
@@ -147,7 +167,7 @@
             }
 
             // check for cyclic dependencies when depm.init is still pending
-            if (DEBUG && depm) {
+            if (CHECK_CYCLES && depm) {
               let cycle = deppath(depm, m['id']);
               if (cycle) {
                 if (cycle[cycle.length-1] != m['id']) {
@@ -295,7 +315,7 @@
 
     // resolve dependencies
     let m = new Module(
-      id || Symbol(),
+      id || Symbol(''),
       {},
       new Array(deps.length),
       fn
@@ -308,6 +328,7 @@
   // Set to a number larger than zero to enable timeout.
   // Whenever define() is called, the timeout is reset and when the timer expires
   // an error is thrown if there are still undefined modules.
+  /** @export {number} */
   define['timeout'] = 0;
 
   define['require'] = _require;

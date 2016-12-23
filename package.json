@@ -1,6 +1,6 @@
 {
   "name": "amdld",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "AMD module loader with deterministic and just-in time module initialization",
   "main": "amdld.min.js",
   "typings": "amdld.d.ts",
@@ -22,8 +22,8 @@
   "license": "MIT",
   "scripts": {
     "test": "node test/test.js && !(which tsc >/dev/null) || (/bin/echo -n 'testing TypeScript... ' && tsc test/tstest.ts && node test/tstest.js && echo ok)",
-    "build": "java -jar node_modules/google-closure-compiler/compiler.jar --compilation_level ADVANCED --env BROWSER --js_output_file amdld.min.js --output_wrapper '(function(){%output%}).call(this);' --language_out ECMASCRIPT5_STRICT --create_source_map amdld.min.js.map amdld.js",
-    "build-pretty": "java -jar node_modules/google-closure-compiler/compiler.jar --formatting PRETTY_PRINT --compilation_level ADVANCED --env BROWSER --js_output_file amdld.min-pretty.js --output_wrapper '(function(){%output%}).call(this);' --language_out ECMASCRIPT5_STRICT --create_source_map amdld.min.js.map amdld.js",
+    "build": "java -jar node_modules/google-closure-compiler/compiler.jar $CLOSUREC_ARGS -D 'DEBUG=false' -O ADVANCED --env BROWSER --new_type_inf --rewrite_polyfills=false --js_output_file amdld.min.js --output_wrapper '(function(){%output%}).call(this);' --language_in ECMASCRIPT6_STRICT --language_out ECMASCRIPT5_STRICT --create_source_map amdld.min.js.map amdld.js",
+    "build-pretty": "CLOSUREC_ARGS=\"--formatting PRETTY_PRINT\" npm run build",
     "prepublish": "npm run build && npm test",
     "postinstall": "if (which java >/dev/null) && [ -f node_modules/google-closure-compiler/compiler.jar ]; then npm run build; fi"
   },
@@ -37,6 +37,6 @@
   "homepage": "https://github.com/rsms/js-amdld#readme",
   "devDependencies": {
     "typescript": "^2.1.4",
-    "google-closure-compiler": "^20161201.0.0"
+    "google-closure-compiler": "20161201.0.0"
   }
 }
