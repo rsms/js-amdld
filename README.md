@@ -49,7 +49,7 @@ If you're only targeting ES6 hosts—for instance in an Electron app—use `amdl
 
 ## Just-in time initialization
 
-![Illustration](misc/timeline.png)
+[![Illustration](misc/timeline.png)](https://www.figma.com/file/HdeD6xoSRs1LeLl1yDeGgHf3/AMDLD)
 
 ## Random loading
 
