@@ -4,7 +4,7 @@ const assert = require('assert')
 const vm = require('vm')
 const fs = require('fs')
 
-let amdldVariants = ['amdld.js', 'amdld.min.js'];
+let amdldVariants = ['amdld.js', 'amdld.min.js', 'amdld.es6.min.js'];
 let logDebug = function(){};
 let isInteractive = null; // [stdoutistty:bool, stderristty:bool]
 

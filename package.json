@@ -1,6 +1,6 @@
 {
   "name": "amdld",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "AMD module loader with deterministic and just-in time module initialization",
   "main": "amdld.min.js",
   "typings": "amdld.d.ts",
@@ -11,7 +11,9 @@
     "amdld.js",
     "amdld.d.ts",
     "amdld.min.js",
-    "amdld.min.js.map"
+    "amdld.min.js.map",
+    "amdld.es6.min.js",
+    "amdld.es6.min.js.map"
   ],
   "keywords": [
     "amd",
@@ -22,8 +24,10 @@
   "license": "MIT",
   "scripts": {
     "test": "node test/test.js && !(which tsc >/dev/null) || (/bin/echo -n 'testing TypeScript... ' && tsc test/tstest.ts && node test/tstest.js && echo ok)",
-    "build": "java -jar node_modules/google-closure-compiler/compiler.jar $CLOSUREC_ARGS -D 'DEBUG=false' -O ADVANCED --env BROWSER --new_type_inf --rewrite_polyfills=false --process_closure_primitives=false --language_in ECMASCRIPT6_STRICT --language_out ECMASCRIPT5_STRICT --js_output_file amdld.min.js --output_wrapper '(function(){%output%}).call(this);' --create_source_map amdld.min.js.map amdld.js",
-    "build-pretty": "CLOSUREC_ARGS=\"--formatting PRETTY_PRINT\" npm run build",
+    "build-es5": "java -jar node_modules/google-closure-compiler/compiler.jar $CLOSUREC_ARGS -D 'DEBUG=false' -O ADVANCED --env BROWSER --new_type_inf --rewrite_polyfills=false --process_closure_primitives=false --language_in ECMASCRIPT6_STRICT --language_out ECMASCRIPT5_STRICT --js_output_file amdld.min.js --output_wrapper '(function(){%output%}).call(this);' --create_source_map amdld.min.js.map amdld.js",
+    "build-es5-pretty": "CLOSUREC_ARGS=\"--formatting PRETTY_PRINT\" npm run build",
+    "build-es6": "node_modules/.bin/babili --compact=true --minified --source-maps --no-comments --out-file amdld.es6.min.js amdld.js",
+    "build": "npm run build-es5 && npm run build-es6",
     "prepublish": "npm run build && npm test",
     "postinstall": "if (which java >/dev/null) && [ -f node_modules/google-closure-compiler/compiler.jar ]; then npm run build; fi"
   },
@@ -36,6 +40,7 @@
   },
   "homepage": "https://github.com/rsms/js-amdld#readme",
   "devDependencies": {
+    "babili": "0.0.9",
     "typescript": "^2.1.4",
     "google-closure-compiler": "20161201.0.0"
   }

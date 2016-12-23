@@ -40,6 +40,12 @@ define("C", { hello: 'Hello' });
 
 Get a tested optimized ES5-compatible build from [unpkg](https://unpkg.com/amdld/) or [NPM](https://www.npmjs.com/package/amdld).
 
+If you're only targeting ES6 hosts—for instance in an Electron app—use `amdld.es6.min.js` instead which uses native generators and other ES6 features (Symbol, const, let, etc):
+
+```html
+<script src="https://unpkg.com/amdld/amdld.es6.min.js"></script>
+```
+
 
 ## Random loading
 

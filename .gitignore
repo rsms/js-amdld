@@ -1,5 +1,5 @@
 .DS_Store
-amdld.min.js
-amdld.min.js.map
+*.min.js
+*.min.js.map
 test/tstest.js
 node_modules
