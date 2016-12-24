@@ -1,6 +1,6 @@
 {
   "name": "amdld",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "AMD module loader with deterministic and just-in time module initialization",
   "main": "amdld.min.js",
   "typings": "amdld.d.ts",
