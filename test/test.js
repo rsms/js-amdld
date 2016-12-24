@@ -6,6 +6,7 @@ const fs = require('fs')
 
 let amdldVariants = ['amdld.g.js', 'amdld.min.js', 'amdld.es6.min.js'];
 let logDebug = function(){};
+let debugMode = false;
 let isInteractive = null; // [stdoutistty:bool, stderristty:bool]
 
 function style(streamno, style, what) {
@@ -60,6 +61,9 @@ function createAMDLD(amdldVariant) {
   let ctx = { console };
   amdldScript.runInNewContext(ctx);
   assert.equal(typeof ctx.define, 'function');
+  if (debugMode) {
+    ctx.define.debug = true;
+  }
   return ctx.define;
 }
 
@@ -220,6 +224,7 @@ if (isInteractive === null) {
 }
 
 if (checkflag('--debug')) {
+  debugMode = true;
   logDebug = function() {
     let args = Array.prototype.slice.call(arguments);
     args.unshift(style(0,'boldMagenta','[debug]'));

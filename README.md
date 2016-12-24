@@ -54,7 +54,7 @@ If you're only targeting ES6 hosts—for instance in an Electron app—use `amdl
 
 ## Random loading
 
-Since AMDLD uses initializeras with pause-and-resumable state, dependencies and modules can be loaded in random order, in synchronous or asynchronous fashion.
+Since AMDLD uses initializers with pause-and-resumable state, dependencies and modules can be loaded in random order, in synchronous or asynchronous fashion.
 
 Say we have some HTML like this where four modules are loaded concurrently and asynchronously:
 
@@ -157,7 +157,7 @@ define(
   // waiting for a dependency.
   // See https://github.com/amdjs/amdjs-api/blob/master/AMD.md for details.
 
-define.timeout : number
+define.timeout : number = 0
   // Set to a number larger than zero to enable timeout.
   // Whenever define() is called, the timeout is reset.
   // When the timer expires an error is thrown if there are still undefined modules.
@@ -165,6 +165,10 @@ define.timeout : number
 define.require(id :string) : any
   // Acquire a module's exported API. Throws an error if the module is not defined.
   // Might return undefined if the module has not yet been initialized.
+
+define.debug : boolean = false
+  // Only available in amdld.g.js, setting this to true causes detailed messages
+  // to be logged to the console.
 ```
 
 
@@ -181,25 +185,30 @@ Although you can use `amdld.js` as-is in an ES6 environment (like latest Chrome 
 To build all of these, first make sure you have `java` in your `$PATH` as it's required for closure-compiler. Then:
 
 ```
-$ npm install # install typescript and closure-compiler
-$ npm run build
+$ yarn
+$ yarn run build
 ...
-$ npm run build
+$ yarn run build
 ...
 ```
 
-To run all unit tests, use `npm test` or the much faster `test/test.js`:
+Run all unit tests:
 
 ```
-$ test/test.js
+$ yarn test
 pass basic @amdld.js
 pass basic @amdld.min.js
 pass cyclic1 @amdld.js
 ...
 all pass
+testing TypeScript... ok
 ```
 
+See `test/test.js -h` for how to run a subset of the tests.
+
 Note: Building and testing requires [Nodejs](https://nodejs.org/) to be installed, but is not required for using AMDLD in a web browser.
+
+Note: If you don't have [`yarn`](https://yarnpkg.com/), you can use `npm` instead for the instructions above.
 
 
 ## MIT License
