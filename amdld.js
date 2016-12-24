@@ -4,9 +4,22 @@
   const CHECK_CYCLES = 1;
   const DEBUG = 0; // = 1 in .g.js builds
 
-  let assert = DEBUG ? function(cond) {
+  function emptyFunction(){}
+
+  /** @const {Function} */
+  const assert = DEBUG ? function(cond) {
     if (!cond) { throw new Error('assertion failure'); }
-  } : function(){};
+  } : emptyFunction;
+
+  /** @const {Function} */
+  const logdebug = DEBUG ? function(args) {
+    if (define['debug']) {
+      (console.debug || console.log).apply(
+        console,
+        ['[define]'].concat(Array.prototype.slice.call(arguments))
+      );
+    }
+  } : emptyFunction;
 
   /** @private {Map<string|symbol,Module>} */
   let modules = new Map;
@@ -191,9 +204,11 @@
     let initg = minitg(m, deps);
 
     return function init() {
+      logdebug('attempting to resolve dependencies for', m['id']);
       let v = initg.next();
       if (v.done) {
         // module initialized
+        logdebug('completed initialization of', m['id']);
         return true;
       }
 
@@ -234,8 +249,10 @@
 
   // define(id?, deps?, fn)
   function define(id, deps, fn) {
+    logdebug('define', id, deps, typeof fn);
     if (define.timeout && define.timeout > 0) {
       if (timeoutReached) {
+        logdebug('define bailing out since timeout has been reached');
         return;
       }
       clearTimeout(timeoutTimer);
@@ -283,6 +300,7 @@
 
     if (!deps || deps.length == 0) {
       // no dependencies
+      logdebug('taking a shortcut becase', id, 'has no dependencies');
       objfact = (objfact == 1 && typeof fn != 'function') ? 2 : objfact;
       let m = new Module(id, objfact ? fn : {}, null, objfact ? null : fn);
       if (id) {
@@ -322,6 +340,10 @@
 
   define['require'] = _require;
   define['amd'] = {};
+
+  if (DEBUG) {
+    define['debug'] = false;
+  }
 
   exports['define'] = define;
 })(this, typeof require == 'function' ? require : null);
