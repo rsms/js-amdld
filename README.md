@@ -186,9 +186,9 @@ To build all of these, first make sure you have `java` in your `$PATH` as it's r
 
 ```
 $ yarn
-$ yarn run build
+$ yarn build
 ...
-$ yarn run build
+$ yarn build
 ...
 ```
 
