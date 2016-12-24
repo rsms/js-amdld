@@ -2,5 +2,8 @@
 *.min.js
 *.g.js
 *.map
+*.lock
+*.tmp
+.babelrc
 test/tstest.js
 node_modules

@@ -1,0 +1,27 @@
+{
+  "plugins": [
+    "minify-dead-code-elimination",
+    "minify-constant-folding",
+    "./misc/babel-plugin-minify",
+
+    "minify-dead-code-elimination",
+    "./misc/babel-plugin-cleanup",
+
+    "minify-constant-folding",
+    "minify-dead-code-elimination",
+    "minify-flip-comparisons",
+    "minify-guarded-expressions",
+    "minify-infinity",
+    "minify-mangle-names",
+    "minify-numeric-literals",
+    "minify-replace",
+    "minify-simplify",
+    "minify-type-constructors",
+    "transform-member-expression-literals",
+    "transform-merge-sibling-variables",
+    "transform-minify-booleans",
+    "transform-property-literals",
+    "transform-regexp-constructors",
+    "transform-simplify-comparison-operators",
+    "transform-undefined-to-void"
+  ]

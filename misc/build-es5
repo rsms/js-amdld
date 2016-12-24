@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+cd "$(dirname "$0")/.."
+
+cleanup() {
+  rm -f .amdld.min.js.tmp .amdld.min.js.tmp.map
+  exit
+}
+
+trap cleanup SIGHUP SIGINT SIGTERM
+
+java -jar node_modules/google-closure-compiler/compiler.jar \
+  -D 'DEBUG=false' \
+  -O ADVANCED \
+  --env BROWSER \
+  --new_type_inf \
+  --rewrite_polyfills=false \
+  --process_closure_primitives=false \
+  --language_in ECMASCRIPT6_STRICT \
+  --language_out ECMASCRIPT5_STRICT \
+  --js_output_file .amdld.min.js.tmp \
+  --output_wrapper '(function(){%output%}).call(this);' \
+  --create_source_map .amdld.min.js.tmp.map \
+  amdld.js
+
+./misc/babelmin .amdld.min.js.tmp amdld.min.js
+
+cleanup

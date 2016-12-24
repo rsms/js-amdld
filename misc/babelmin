@@ -1,0 +1,68 @@
+#!/bin/bash
+set -e
+
+INFILE=$1
+OUTFILE=$2
+
+if [[ "$INFILE" == "" ]] || [[ "$OUTFILE" == "" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]
+then
+  echo "usage: $0 <infile> <outfile>" >&2
+  exit 1
+fi
+
+if [[ ! -f "$INFILE" ]]; then
+  echo "$0: no such file $INFILE" >&2
+  exit 1
+fi
+
+INFILEDIR=$(dirname "$INFILE")
+pushd "$INFILEDIR" >/dev/null
+INFILE=$(pwd)/$(basename "$INFILE")
+popd >/dev/null
+
+OUTDIR=$(dirname "$OUTFILE")
+mkdir -p "$OUTDIR"
+pushd "$OUTDIR" >/dev/null
+OUTFILE=$(pwd)/$(basename "$OUTFILE")
+popd >/dev/null
+
+# echo "INFILE: $INFILE"
+# echo "OUTFILE: $OUTFILE"
+
+pushd "$(dirname "$0")/.." >/dev/null
+SRCDIR=$(pwd)
+popd >/dev/null
+
+cd "$INFILEDIR"
+
+# we have to make a temporary .babelrc file because babel-cli doesn't allow
+# passing some arguments by the CL (i.e. inputSourceMap)
+# Unfortunately this means that this program can not run multiple instances
+# compiling files in the same directory (since .babelrc must be written to
+# the directory in which the source file resides.)
+
+cp -fa "$SRCDIR/misc/babelrc.in" .babelrc
+INFILEMAP=${INFILE}.map
+if [[ -f "$INFILEMAP" ]]; then
+  echo ',' >> .babelrc
+  echo -n '"inputSourceMap": ' >> .babelrc
+  cat "$INFILEMAP" >> .babelrc
+fi
+echo '}' >> .babelrc
+
+cleanup() {
+  rm -rf "$INFILEDIR/.babelrc"
+  exit
+}
+
+trap cleanup SIGHUP SIGINT SIGTERM
+
+"$SRCDIR/node_modules/.bin/babel" \
+  --compact=true \
+  --minified \
+  --no-comments \
+  --source-maps=true \
+  --out-file "$OUTFILE" \
+  "$INFILE"
+
+cleanup
