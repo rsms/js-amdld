@@ -187,9 +187,6 @@ To build all of these, first make sure you have `java` in your `$PATH` as it's r
 ```
 $ yarn
 $ yarn build
-...
-$ yarn build
-...
 ```
 
 Run all unit tests:
